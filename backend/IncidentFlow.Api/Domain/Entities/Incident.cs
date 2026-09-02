@@ -14,6 +14,12 @@ public class Incident
     public DateTimeOffset? UpdatedAt { get; private set; }
     public DateTimeOffset? ResolvedAt { get; private set; }
 
+    private Incident()
+    {
+        Title = null!;
+        Description = null!;
+    }
+
     public Incident(
         string title,
         string description,
