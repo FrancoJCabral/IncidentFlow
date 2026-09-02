@@ -1,0 +1,56 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+TestResults/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# .NET tooling and packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+secrets.json
+appsettings.Local.json
+appsettings.*.local.json
+
+# Logs, temporary files, and operating-system metadata
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE and analysis caches
+.idea/
+_ReSharper*/
+*.DotSettings.user
+*.sln.iml
+
