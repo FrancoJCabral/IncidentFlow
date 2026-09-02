@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{44AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncidentFlow.Api", "backend\IncidentFlow.Api\IncidentFlow.Api.csproj", "{65F1CB7D-9D81-4B17-A14F-BDAAA3143C3B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E313C93A-C270-4A8E-9D64-7AA58B0C1118}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IncidentFlow.Domain.Tests", "tests\IncidentFlow.Domain.Tests\IncidentFlow.Domain.Tests.csproj", "{A8AE2EB8-8883-40B5-9141-3BFB76AED30C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{65F1CB7D-9D81-4B17-A14F-BDAAA3143C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65F1CB7D-9D81-4B17-A14F-BDAAA3143C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65F1CB7D-9D81-4B17-A14F-BDAAA3143C3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8AE2EB8-8883-40B5-9141-3BFB76AED30C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8AE2EB8-8883-40B5-9141-3BFB76AED30C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8AE2EB8-8883-40B5-9141-3BFB76AED30C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8AE2EB8-8883-40B5-9141-3BFB76AED30C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{65F1CB7D-9D81-4B17-A14F-BDAAA3143C3B} = {44AA29DF-6E79-4330-9ABA-98F8C45AD9EA}
+		{A8AE2EB8-8883-40B5-9141-3BFB76AED30C} = {E313C93A-C270-4A8E-9D64-7AA58B0C1118}
 	EndGlobalSection
 EndGlobal
