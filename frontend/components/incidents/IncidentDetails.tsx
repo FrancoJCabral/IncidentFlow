@@ -11,6 +11,7 @@ export function IncidentDetails({ incident }: { incident: Incident | null }) {
     <div className="details-heading"><span className="incident-id" title={incident.id}>{incidentReference(incident.id)}</span><h3>{incident.title}</h3><div className="details-badges"><StatusBadge value={incident.status}/><PriorityBadge value={incident.priority}/></div></div>
     <div className="details-section"><h4>Description</h4><p>{incident.description}</p></div>
     <dl className="details-grid"><div><dt>Category</dt><dd>{incident.category}</dd></div><div><dt>Priority</dt><dd><PriorityBadge value={incident.priority}/></dd></div><div><dt>Status</dt><dd><StatusBadge value={incident.status}/></dd></div><div><dt>Created at</dt><dd>{formatIncidentDate(incident.createdAt)}</dd></div><div><dt>Updated at</dt><dd>{formatIncidentDate(incident.updatedAt)}</dd></div>{incident.resolvedAt && <div><dt>Resolved at</dt><dd>{formatIncidentDate(incident.resolvedAt)}</dd></div>}</dl>
-    <div className="detail-actions"><button className="primary-action" type="button" disabled>Start Progress</button><button className="secondary-action" type="button" disabled>Resolve</button><button className="icon-button bordered" type="button" aria-label="More actions" disabled><Icon name="dots"/></button></div>
+    <div className="detail-actions"><Link className="primary-action" href={`/incidents/${incident.id}/edit`}>Edit incident</Link><button className="secondary-action" type="button" disabled>Change status</button><button className="icon-button bordered" type="button" aria-label="More actions" disabled><Icon name="dots"/></button></div>
   </aside>;
 }
+import Link from "next/link";

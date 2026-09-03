@@ -21,6 +21,8 @@ export interface CreateIncidentInput {
   category: IncidentCategory;
 }
 
+export type UpdateIncidentInput = CreateIncidentInput;
+
 export type StatTone = "teal" | "blue" | "red" | "green";
 
 export interface DashboardStat {
