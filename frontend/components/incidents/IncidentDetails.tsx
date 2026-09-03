@@ -4,15 +4,17 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/layout/Icon";
-import { changeIncidentStatus, IncidentNotFoundError, IncidentsUnauthorizedError } from "@/lib/api/incidents-client";
+import { archiveIncident, changeIncidentStatus, IncidentNotFoundError, IncidentsUnauthorizedError } from "@/lib/api/incidents-client";
 import { formatIncidentDate, incidentReference } from "@/lib/incidents/presentation";
 import type { Incident, IncidentStatus } from "@/types/incident";
 import { PriorityBadge, StatusBadge } from "./Badge";
 
-export function IncidentDetails({ incident, onIncidentChanged }: { incident: Incident | null; onIncidentChanged: (incident: Incident) => void }) {
+export function IncidentDetails({ incident, onIncidentChanged, onIncidentArchived }: { incident: Incident | null; onIncidentChanged: (incident: Incident) => void; onIncidentArchived: (id: string) => void }) {
   const router = useRouter();
   const [changingTo, setChangingTo] = useState<IncidentStatus>();
   const [statusError, setStatusError] = useState<string>();
+  const [confirmingArchive, setConfirmingArchive] = useState(false);
+  const [archiving, setArchiving] = useState(false);
 
   async function changeStatus(status: IncidentStatus) {
     if (!incident || changingTo) return;
@@ -28,6 +30,23 @@ export function IncidentDetails({ incident, onIncidentChanged }: { incident: Inc
     }
   }
 
+  async function confirmArchive() {
+    if (!incident || archiving) return;
+    setArchiving(true);
+    setStatusError(undefined);
+    try {
+      await archiveIncident(incident.id);
+      setConfirmingArchive(false);
+      onIncidentArchived(incident.id);
+    } catch (error) {
+      if (error instanceof IncidentsUnauthorizedError) { router.replace("/login"); router.refresh(); return; }
+      setConfirmingArchive(false);
+      setStatusError(error instanceof Error ? error.message : "Unable to archive incident. Please try again.");
+    } finally {
+      setArchiving(false);
+    }
+  }
+
   if (!incident) return <aside className="panel incident-details details-empty"><h3>No incident selected</h3><p>Select an incident to view its details.</p></aside>;
 
   return <aside className="panel incident-details">
@@ -40,8 +59,9 @@ export function IncidentDetails({ incident, onIncidentChanged }: { incident: Inc
       {incident.status === "Open" && <button className="primary-action" type="button" disabled={Boolean(changingTo)} onClick={() => void changeStatus("InProgress")}>{changingTo ? "Starting..." : "Start progress"}</button>}
       {incident.status === "InProgress" && <button className="primary-action" type="button" disabled={Boolean(changingTo)} onClick={() => void changeStatus("Resolved")}>{changingTo ? "Resolving..." : "Resolve"}</button>}
       {incident.status === "Resolved" && <><button className="primary-action" type="button" disabled={Boolean(changingTo)} onClick={() => void changeStatus("Closed")}>{changingTo === "Closed" ? "Closing..." : "Close incident"}</button><button className="secondary-action" type="button" disabled={Boolean(changingTo)} onClick={() => void changeStatus("InProgress")}>{changingTo === "InProgress" ? "Reopening..." : "Reopen"}</button></>}
-      {incident.status === "Closed" && <p className="terminal-status">Closed is the final status.</p>}
-      <Link className="secondary-action edit-incident-action" href={`/incidents/${incident.id}/edit`} aria-disabled={Boolean(changingTo)}>Edit incident</Link>
+      {incident.status === "Closed" && <><p className="terminal-status">Closed is the final status.</p><button className="archive-action" type="button" disabled={archiving} onClick={() => setConfirmingArchive(true)}>Archive incident</button></>}
+      <Link className="secondary-action edit-incident-action" href={`/incidents/${incident.id}/edit`} aria-disabled={Boolean(changingTo) || archiving}>Edit incident</Link>
     </div>
+    {confirmingArchive && <div className="archive-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !archiving) setConfirmingArchive(false); }}><div className="archive-dialog" role="dialog" aria-modal="true" aria-labelledby="archive-dialog-title" aria-describedby="archive-dialog-description"><div className="archive-dialog-icon" aria-hidden="true">↧</div><h3 id="archive-dialog-title">Archive this incident?</h3><p id="archive-dialog-description">This incident will be removed from the active workspace but its record will be preserved.</p><div><button className="secondary-action" type="button" disabled={archiving} onClick={() => setConfirmingArchive(false)}>Cancel</button><button className="archive-confirm" type="button" disabled={archiving} onClick={() => void confirmArchive()}>{archiving ? "Archiving..." : "Archive incident"}</button></div></div></div>}
   </aside>;
 }

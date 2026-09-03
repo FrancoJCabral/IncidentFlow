@@ -64,3 +64,11 @@ export async function changeIncidentStatus(id: string, status: IncidentStatus): 
   if (!response.ok) throw new Error("Unable to update incident status. Please try again.");
   return await response.json() as Incident;
 }
+
+export async function archiveIncident(id: string): Promise<void> {
+  const response = await fetch(`/api/incidents/${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (response.status === 401) throw new IncidentsUnauthorizedError("Unauthorized");
+  if (response.status === 404) throw new IncidentNotFoundError("This incident is no longer available.");
+  if (response.status === 400) throw new IncidentValidationError("Only closed incidents can be archived.");
+  if (response.status !== 204) throw new Error("Unable to archive incident. Please try again.");
+}

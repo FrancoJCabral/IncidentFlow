@@ -27,6 +27,52 @@ public class IncidentTests
         Assert.Null(incident.ResolvedAt);
     }
 
+    [Fact]
+    public void Constructor_CreatesActiveIncidentWithoutArchiveTimestamp()
+    {
+        var incident = CreateIncident();
+
+        Assert.False(incident.IsArchived);
+        Assert.Null(incident.ArchivedAt);
+    }
+
+    [Fact]
+    public void Archive_WhenClosed_ArchivesWithOneCoherentTimestamp()
+    {
+        var incident = CreateIncidentInStatus(IncidentStatus.Closed);
+        var beforeArchive = DateTimeOffset.UtcNow;
+
+        incident.Archive();
+
+        var afterArchive = DateTimeOffset.UtcNow;
+        Assert.True(incident.IsArchived);
+        Assert.NotNull(incident.ArchivedAt);
+        Assert.InRange(incident.ArchivedAt.Value, beforeArchive, afterArchive);
+        Assert.Equal(incident.ArchivedAt, incident.UpdatedAt);
+    }
+
+    [Theory]
+    [InlineData(IncidentStatus.Open)]
+    [InlineData(IncidentStatus.InProgress)]
+    [InlineData(IncidentStatus.Resolved)]
+    public void Archive_WhenNotClosed_ThrowsInvalidOperationException(IncidentStatus status)
+    {
+        var incident = CreateIncidentInStatus(status);
+
+        Assert.Throws<InvalidOperationException>(() => incident.Archive());
+        Assert.False(incident.IsArchived);
+        Assert.Null(incident.ArchivedAt);
+    }
+
+    [Fact]
+    public void Archive_WhenAlreadyArchived_ThrowsInvalidOperationException()
+    {
+        var incident = CreateIncidentInStatus(IncidentStatus.Closed);
+        incident.Archive();
+
+        Assert.Throws<InvalidOperationException>(() => incident.Archive());
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]

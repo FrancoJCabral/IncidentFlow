@@ -48,9 +48,18 @@ public class IncidentConfiguration : IEntityTypeConfiguration<Incident>
         builder.Property(incident => incident.ResolvedAt)
             .IsRequired(false);
 
+        builder.Property(incident => incident.IsArchived)
+            .IsRequired();
+
+        builder.Property(incident => incident.ArchivedAt)
+            .IsRequired(false);
+
         builder.HasIndex(incident => incident.Status);
         builder.HasIndex(incident => incident.Priority);
         builder.HasIndex(incident => incident.Category);
         builder.HasIndex(incident => incident.CreatedAt);
+        builder.HasIndex(incident => incident.IsArchived);
+
+        builder.HasQueryFilter(incident => !incident.IsArchived);
     }
 }

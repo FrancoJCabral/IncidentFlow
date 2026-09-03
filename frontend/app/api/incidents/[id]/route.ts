@@ -66,3 +66,26 @@ export async function PUT(request: Request, context: RouteContext) {
     return NextResponse.json({ message: "Unable to update incident. Please try again." }, { status: 500 });
   }
 }
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  const { cookieStore, token } = await session();
+  if (!token) return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+  const { id } = await context.params;
+  try {
+    const backendResponse = await fetch(`${getBackendUrl()}/api/incidents/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    if (backendResponse.status === 401) {
+      cookieStore.delete(AUTH_COOKIE_NAME);
+      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+    }
+    if (backendResponse.status === 404) return NextResponse.json({ message: "This incident is no longer available." }, { status: 404 });
+    if (backendResponse.status === 400) return NextResponse.json({ message: "Only closed incidents can be archived." }, { status: 400 });
+    if (backendResponse.status !== 204) throw new Error("Backend incident archive failed.");
+    return new NextResponse(null, { status: 204 });
+  } catch {
+    return NextResponse.json({ message: "Unable to archive incident. Please try again." }, { status: 500 });
+  }
+}

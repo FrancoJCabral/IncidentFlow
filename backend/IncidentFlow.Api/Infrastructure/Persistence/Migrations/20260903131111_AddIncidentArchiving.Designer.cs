@@ -4,6 +4,7 @@ using IncidentFlow.Api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IncidentFlow.Api.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(IncidentFlowDbContext))]
-    partial class IncidentFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260903131111_AddIncidentArchiving")]
+    partial class AddIncidentArchiving
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -97,6 +97,16 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         return await command.ExecuteScalarAsync() as string;
     }
 
+    public async Task<Incident?> GetIncidentIgnoringFiltersAsync(Guid id)
+    {
+        using var scope = Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<IncidentFlowDbContext>();
+        return await dbContext.Incidents
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(incident => incident.Id == id);
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);

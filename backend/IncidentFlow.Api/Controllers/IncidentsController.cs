@@ -105,6 +105,25 @@ public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBa
         return Ok(ToResponse(incident));
     }
 
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Archive(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var incident = await dbContext.Incidents
+            .FirstOrDefaultAsync(incident => incident.Id == id, cancellationToken);
+
+        if (incident is null)
+        {
+            return NotFound();
+        }
+
+        incident.Archive();
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
+    }
+
     private static IncidentResponse ToResponse(Incident incident) => new(
         incident.Id,
         incident.Title,

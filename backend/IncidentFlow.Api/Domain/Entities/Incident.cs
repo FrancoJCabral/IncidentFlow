@@ -13,6 +13,8 @@ public class Incident
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     public DateTimeOffset? ResolvedAt { get; private set; }
+    public bool IsArchived { get; private set; }
+    public DateTimeOffset? ArchivedAt { get; private set; }
 
     private Incident()
     {
@@ -36,6 +38,8 @@ public class Incident
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = null;
         ResolvedAt = null;
+        IsArchived = false;
+        ArchivedAt = null;
     }
 
     public void Update(
@@ -86,6 +90,24 @@ public class Incident
 
         Status = newStatus;
         UpdatedAt = changedAt;
+    }
+
+    public void Archive()
+    {
+        if (Status != IncidentStatus.Closed)
+        {
+            throw new InvalidOperationException("Only closed incidents can be archived.");
+        }
+
+        if (IsArchived)
+        {
+            throw new InvalidOperationException("The incident is already archived.");
+        }
+
+        var archivedAt = DateTimeOffset.UtcNow;
+        IsArchived = true;
+        ArchivedAt = archivedAt;
+        UpdatedAt = archivedAt;
     }
 
     private static string ValidateTitle(string title)
