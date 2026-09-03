@@ -70,13 +70,17 @@ export function Dashboard() {
   const stats = useMemo(() => calculateStats(incidents), [incidents]);
   const selectedIncident = incidents.find((item) => item.id === selectedId) ?? null;
 
+  function handleIncidentChanged(updated: Incident) {
+    setIncidents((current) => current.map((incident) => incident.id === updated.id ? updated : incident));
+  }
+
   return <div className="dashboard-content">
     <section className="welcome-row" aria-labelledby="dashboard-overview"><div><p className="eyebrow">Overview</p><h2 id="dashboard-overview">Incident operations at a glance</h2><p>Monitor priorities, track progress, and keep your team aligned.</p></div><Link className="primary-action" href="/incidents/new"><span aria-hidden="true">＋</span> New incident</Link></section>
     {status === "loading" ? <DashboardSkeleton/> : <>
       <section className="stats-grid" aria-label="Incident statistics">{stats.map((stat) => <StatCard key={stat.label} stat={stat}/>)}</section>
       {status === "error" ? <section className="panel dashboard-state error-state"><div className="state-icon">!</div><h3>Unable to load incidents.</h3><p>Please check your connection and try again.</p><button className="secondary-action" type="button" onClick={() => void loadIncidents()}>Try again</button></section>
         : incidents.length === 0 ? <section className="panel dashboard-state"><div className="state-icon empty">✓</div><h3>No incidents yet</h3><p>Incidents created in your workspace will appear here.</p></section>
-        : <section className="workspace-grid"><IncidentTable incidents={incidents} selectedId={selectedId} onSelect={setSelectedId}/><IncidentDetails incident={selectedIncident}/></section>}
+        : <section className="workspace-grid"><IncidentTable incidents={incidents} selectedId={selectedId} onSelect={setSelectedId}/><IncidentDetails incident={selectedIncident} onIncidentChanged={handleIncidentChanged}/></section>}
     </>}
   </div>;
 }
