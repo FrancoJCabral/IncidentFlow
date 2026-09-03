@@ -1,12 +1,14 @@
 using IncidentFlow.Api.Contracts.Incidents;
 using IncidentFlow.Api.Domain.Entities;
 using IncidentFlow.Api.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IncidentFlow.Api.Controllers;
 
 [ApiController]
+[Authorize(Roles = "Admin,Operator")]
 [Route("api/incidents")]
 public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBase
 {
@@ -36,10 +38,10 @@ public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBa
     public async Task<ActionResult<IncidentResponse[]>> GetAll(
         CancellationToken cancellationToken)
     {
-        var incidents = await dbContext.Incidents
-            .AsNoTracking()
-            .OrderByDescending(incident => incident.CreatedAt)
-            .ToListAsync(cancellationToken);
+        var incidents = (await dbContext.Incidents
+                .AsNoTracking()
+                .ToListAsync(cancellationToken))
+            .OrderByDescending(incident => incident.CreatedAt);
 
         return Ok(incidents.Select(ToResponse).ToArray());
     }

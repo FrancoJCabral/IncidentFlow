@@ -7,6 +7,7 @@ public class IncidentFlowDbContext(DbContextOptions<IncidentFlowDbContext> optio
     : DbContext(options)
 {
     public DbSet<Incident> Incidents => Set<Incident>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

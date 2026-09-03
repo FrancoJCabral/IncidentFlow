@@ -1,4 +1,5 @@
 using System.Data.Common;
+using IncidentFlow.Api.Domain.Entities;
 using IncidentFlow.Api.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -28,6 +29,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+        builder.UseSetting("Jwt:Issuer", "IncidentFlow.Tests");
+        builder.UseSetting("Jwt:Audience", "IncidentFlow.Api.Tests");
+        builder.UseSetting("Jwt:ExpirationMinutes", "15");
+        builder.UseSetting(
+            "Jwt:Key",
+            "integration-tests-only-signing-key-at-least-32-bytes-long");
+
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<IncidentFlowDbContext>();
@@ -71,6 +80,23 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         return host;
     }
 
+    public async Task<string?> GetStoredPasswordHashAsync(string email)
+    {
+        if (connection is null)
+        {
+            throw new InvalidOperationException("The test database is not initialized.");
+        }
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT PasswordHash FROM Users WHERE Email = $email";
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$email";
+        parameter.Value = email;
+        command.Parameters.Add(parameter);
+
+        return await command.ExecuteScalarAsync() as string;
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
@@ -88,7 +114,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            throw new ApplicationException("Sensitive database failure details.");
+            var savesIncident = eventData.Context?.ChangeTracker
+                .Entries<Incident>()
+                .Any(entry => entry.State is EntityState.Added or EntityState.Modified) == true;
+
+            return savesIncident
+                ? throw new ApplicationException("Sensitive database failure details.")
+                : ValueTask.FromResult(result);
         }
     }
 }

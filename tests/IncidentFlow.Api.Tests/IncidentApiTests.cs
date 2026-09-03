@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +8,9 @@ using Xunit;
 
 namespace IncidentFlow.Api.Tests;
 
-public class IncidentApiTests : IClassFixture<CustomWebApplicationFactory>
+public class IncidentApiTests :
+    IClassFixture<CustomWebApplicationFactory>,
+    IAsyncLifetime
 {
     private readonly HttpClient client;
 
@@ -15,6 +18,13 @@ public class IncidentApiTests : IClassFixture<CustomWebApplicationFactory>
     {
         client = factory.CreateClient();
     }
+
+    public async Task InitializeAsync()
+    {
+        await AuthenticateAsync(client);
+    }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Create_WithEmptyTitle_ReturnsValidationProblemDetails()
@@ -147,6 +157,7 @@ public class IncidentApiTests : IClassFixture<CustomWebApplicationFactory>
     {
         using var factory = new UnexpectedExceptionWebApplicationFactory();
         using var throwingClient = factory.CreateClient();
+        await AuthenticateAsync(throwingClient);
 
         var response = await throwingClient.PostAsJsonAsync(
             "/api/incidents",
@@ -157,6 +168,20 @@ public class IncidentApiTests : IClassFixture<CustomWebApplicationFactory>
             HttpStatusCode.InternalServerError);
         Assert.Equal("An unexpected error occurred", problem.Title);
         Assert.DoesNotContain("Sensitive database failure", problem.Detail);
+    }
+
+    private static async Task AuthenticateAsync(HttpClient httpClient)
+    {
+        var email = $"incident-tests-{Guid.NewGuid():N}@example.com";
+        var response = await httpClient.PostAsJsonAsync(
+            "/api/auth/register",
+            new { email, password = "TestPassword123!" });
+        response.EnsureSuccessStatusCode();
+
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var accessToken = document.RootElement.GetProperty("accessToken").GetString();
+        httpClient.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", accessToken);
     }
 
     private async Task<HttpResponseMessage> PostIncidentAsync(
