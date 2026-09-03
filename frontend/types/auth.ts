@@ -6,6 +6,6 @@ export interface AuthenticatedUser {
   role: UserRole;
 }
 
-export interface LoginResult {
+export interface AuthResult {
   user: AuthenticatedUser;
 }

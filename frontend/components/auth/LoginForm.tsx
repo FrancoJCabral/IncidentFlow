@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { signIn } from "@/lib/api/auth-client";
 
 interface LoginFormData {
@@ -94,6 +95,7 @@ export function LoginForm() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
       </form>
+      <p className="auth-switch">Don&apos;t have an account? <Link href="/register">Create account</Link></p>
     </div>
   );
 }

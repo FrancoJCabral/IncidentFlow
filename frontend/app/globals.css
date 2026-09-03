@@ -60,3 +60,7 @@ button { cursor:pointer; } a { color:inherit; text-decoration:none; }
 @keyframes auth-pulse { to { opacity:.48; } }
 @media (prefers-reduced-motion:reduce) { .avatar-skeleton,.user-copy-skeleton span { animation:none; } }
 @media (max-width:760px) { .user-profile { padding-left:0; }.sign-out-button { width:34px; padding:0; overflow:hidden; color:transparent; }.sign-out-button::after { content:"↗"; display:block; color:#53615f; font-size:14px; transform:rotate(45deg); }.auth-loading { min-width:78px; }.user-copy-skeleton { display:none; } }
+
+/* Registration */
+.register-card { max-width:430px; }.register-form { gap:17px; margin-top:28px; }.auth-switch { margin:24px 0 0; color:#7c8886; font-size:11px; text-align:center; }.auth-switch a { color:var(--teal-dark); font-weight:680; }.auth-switch a:hover { text-decoration:underline; text-underline-offset:3px; }.auth-switch a:focus-visible { outline:2px solid var(--teal); outline-offset:3px; border-radius:2px; }
+@media (max-height:760px) and (min-width:721px) { .register-card .login-heading h2 { font-size:27px; }.register-form { gap:12px; margin-top:22px; }.register-card .auth-input-wrap { height:44px; }.register-card .auth-switch { margin-top:16px; } }

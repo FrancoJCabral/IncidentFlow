@@ -19,26 +19,26 @@ export async function POST(request: Request) {
   }
 
   try {
-    const backendResponse = await fetch(`${getBackendUrl()}/api/auth/login`, {
+    const backendResponse = await fetch(`${getBackendUrl()}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: credentials.email, password: credentials.password }),
       cache: "no-store",
     });
 
-    if (backendResponse.status === 401) {
-      return NextResponse.json({ message: "Invalid email or password." }, { status: 401 });
+    if (backendResponse.status === 409) {
+      return NextResponse.json({ message: "An account with this email already exists." }, { status: 409 });
     }
     if (backendResponse.status === 400) {
       return NextResponse.json({ message: "Check the information entered and try again." }, { status: 400 });
     }
-    if (!backendResponse.ok) throw new Error("Backend authentication failed.");
+    if (!backendResponse.ok) throw new Error("Backend registration failed.");
 
     const auth = await backendResponse.json() as BackendAuthResponse;
-    const response = NextResponse.json({ user: auth.user });
+    const response = NextResponse.json({ user: auth.user }, { status: 201 });
     setSessionCookie(response, auth.accessToken, auth.expiresAt);
     return response;
   } catch {
-    return NextResponse.json({ message: "Unable to sign in. Please try again." }, { status: 502 });
+    return NextResponse.json({ message: "Unable to create your account. Please try again." }, { status: 502 });
   }
 }
