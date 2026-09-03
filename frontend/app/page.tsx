@@ -4,8 +4,12 @@ import { IncidentTable } from "@/components/incidents/IncidentTable";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { incidents, stats } from "@/data/dashboard";
+import { getServerUser } from "@/lib/auth/server";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  if (!await getServerUser()) redirect("/login");
+
   return (
     <div className="app-shell">
       <Sidebar />

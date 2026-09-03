@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "@/lib/api/auth-client";
 
 interface LoginFormData {
   email: string;
@@ -25,10 +27,12 @@ function validate(formData: LoginFormData): LoginFormErrors {
 }
 
 export function LoginForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string>();
 
   function updateField(field: keyof LoginFormData, value: string) {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -42,8 +46,15 @@ export function LoginForm() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
-    await new Promise((resolve) => window.setTimeout(resolve, 900));
-    setIsSubmitting(false);
+    setSubmitError(undefined);
+    try {
+      await signIn(formData.email.trim(), formData.password);
+      router.replace("/");
+      router.refresh();
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Unable to sign in. Please try again.");
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -77,6 +88,7 @@ export function LoginForm() {
           </div>
           {errors.password && <p className="field-error" id="password-error" role="alert">{errors.password}</p>}
         </div>
+        {submitError && <p className="login-submit-error" role="alert">{submitError}</p>}
         <button className="login-submit" type="submit" disabled={isSubmitting}>
           {isSubmitting && <span className="submit-spinner" aria-hidden="true"/>}
           {isSubmitting ? "Signing in..." : "Sign in"}
