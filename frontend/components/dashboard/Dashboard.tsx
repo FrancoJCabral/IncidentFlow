@@ -6,7 +6,9 @@ import Link from "next/link";
 import { IncidentDetails } from "@/components/incidents/IncidentDetails";
 import { IncidentTable } from "@/components/incidents/IncidentTable";
 import { getIncidents, IncidentsUnauthorizedError } from "@/lib/api/incidents-client";
+import { incidentReference } from "@/lib/incidents/presentation";
 import type { DashboardStat, Incident } from "@/types/incident";
+import { DashboardToolbar, emptyDashboardFilters, type DashboardFilters } from "./DashboardToolbar";
 import { StatCard } from "./StatCard";
 
 function isToday(value: string | null): boolean {
@@ -25,11 +27,24 @@ function calculateStats(incidents: Incident[]): DashboardStat[] {
   ];
 }
 
+function filterIncidents(incidents: Incident[], filters: DashboardFilters): Incident[] {
+  const search = filters.search.trim().toLocaleLowerCase();
+  return incidents.filter((incident) => {
+    const matchesSearch = !search || [incident.title, incident.description, incidentReference(incident.id)]
+      .some((value) => value.toLocaleLowerCase().includes(search));
+    return matchesSearch &&
+      (filters.status === "All" || incident.status === filters.status) &&
+      (filters.priority === "All" || incident.priority === filters.priority) &&
+      (filters.category === "All" || incident.category === filters.category);
+  });
+}
+
 export function Dashboard() {
   const router = useRouter();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [selectedId, setSelectedId] = useState<string>();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [filters, setFilters] = useState<DashboardFilters>(emptyDashboardFilters);
 
   const loadIncidents = useCallback(async () => {
     setStatus("loading");
@@ -68,16 +83,30 @@ export function Dashboard() {
   }, [router]);
 
   const stats = useMemo(() => calculateStats(incidents), [incidents]);
-  const selectedIncident = incidents.find((item) => item.id === selectedId) ?? null;
+  const visibleIncidents = useMemo(() => filterIncidents(incidents, filters), [incidents, filters]);
+  const selectedIncident = visibleIncidents.find((item) => item.id === selectedId) ?? null;
+  const hasFilters = Boolean(filters.search.trim()) || filters.status !== "All" || filters.priority !== "All" || filters.category !== "All";
+
+  function applyFilters(next: DashboardFilters) {
+    const nextVisible = filterIncidents(incidents, next);
+    setFilters(next);
+    setSelectedId((current) => nextVisible.some((incident) => incident.id === current) ? current : nextVisible[0]?.id);
+  }
 
   function handleIncidentChanged(updated: Incident) {
-    setIncidents((current) => current.map((incident) => incident.id === updated.id ? updated : incident));
+    setIncidents((current) => {
+      const next = current.map((incident) => incident.id === updated.id ? updated : incident);
+      const nextVisible = filterIncidents(next, filters);
+      setSelectedId((selected) => nextVisible.some((incident) => incident.id === selected) ? selected : nextVisible[0]?.id);
+      return next;
+    });
   }
 
   function handleIncidentArchived(id: string) {
     setIncidents((current) => {
       const remaining = current.filter((incident) => incident.id !== id);
-      setSelectedId((selected) => selected === id ? remaining[0]?.id : selected);
+      const nextVisible = filterIncidents(remaining, filters);
+      setSelectedId((selected) => nextVisible.some((incident) => incident.id === selected) ? selected : nextVisible[0]?.id);
       return remaining;
     });
   }
@@ -87,8 +116,8 @@ export function Dashboard() {
     {status === "loading" ? <DashboardSkeleton/> : <>
       <section className="stats-grid" aria-label="Incident statistics">{stats.map((stat) => <StatCard key={stat.label} stat={stat}/>)}</section>
       {status === "error" ? <section className="panel dashboard-state error-state"><div className="state-icon">!</div><h3>Unable to load incidents.</h3><p>Please check your connection and try again.</p><button className="secondary-action" type="button" onClick={() => void loadIncidents()}>Try again</button></section>
-        : incidents.length === 0 ? <section className="panel dashboard-state"><div className="state-icon empty">✓</div><h3>No incidents yet</h3><p>Incidents created in your workspace will appear here.</p></section>
-        : <section className="workspace-grid"><IncidentTable incidents={incidents} selectedId={selectedId} onSelect={setSelectedId}/><IncidentDetails incident={selectedIncident} onIncidentChanged={handleIncidentChanged} onIncidentArchived={handleIncidentArchived}/></section>}
+        : incidents.length === 0 ? <section className="panel dashboard-state"><div className="state-icon empty">✓</div><h3>No incidents yet</h3><p>Create your first incident to start tracking issues.</p><Link className="primary-action" href="/incidents/new">New incident</Link></section>
+        : <><DashboardToolbar filters={filters} hasFilters={hasFilters} onChange={applyFilters} onClear={() => applyFilters(emptyDashboardFilters)}/><p className="incident-result-count" aria-live="polite">{hasFilters ? `${visibleIncidents.length} of ${incidents.length} ${incidents.length === 1 ? "incident" : "incidents"}` : `${incidents.length} ${incidents.length === 1 ? "incident" : "incidents"}`}</p><section className="workspace-grid">{visibleIncidents.length === 0 ? <section className="panel dashboard-state filter-empty-state"><div className="state-icon empty">⌕</div><h3>No incidents match your filters</h3><p>Try changing your search or filters.</p><button className="secondary-action" type="button" onClick={() => applyFilters(emptyDashboardFilters)}>Clear filters</button></section> : <IncidentTable incidents={visibleIncidents} selectedId={selectedId} onSelect={setSelectedId}/>}<IncidentDetails incident={selectedIncident} onIncidentChanged={handleIncidentChanged} onIncidentArchived={handleIncidentArchived}/></section></>}
     </>}
   </div>;
 }
