@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<IncidentFlowDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("IncidentFlowDb")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IncidentFlowDb")));
 
 var app = builder.Build();
 

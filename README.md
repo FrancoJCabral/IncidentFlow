@@ -25,7 +25,7 @@ Este proyecto de portfolio está orientado a demostrar capacidades de desarrollo
 ### Stack planificado
 
 - Entity Framework Core
-- PostgreSQL
+- SQL Server
 - Next.js
 - TypeScript
 - JWT Authentication
