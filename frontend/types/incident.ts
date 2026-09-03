@@ -10,7 +10,8 @@ export interface Incident {
   priority: IncidentPriority;
   status: IncidentStatus;
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
+  resolvedAt: string | null;
 }
 
 export type StatTone = "teal" | "blue" | "red" | "green";
