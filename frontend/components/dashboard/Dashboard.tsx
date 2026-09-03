@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { IncidentDetails } from "@/components/incidents/IncidentDetails";
 import { IncidentTable } from "@/components/incidents/IncidentTable";
 import { getIncidents, IncidentsUnauthorizedError } from "@/lib/api/incidents-client";
@@ -70,7 +71,7 @@ export function Dashboard() {
   const selectedIncident = incidents.find((item) => item.id === selectedId) ?? null;
 
   return <div className="dashboard-content">
-    <section className="welcome-row" aria-labelledby="dashboard-overview"><div><p className="eyebrow">Overview</p><h2 id="dashboard-overview">Incident operations at a glance</h2><p>Monitor priorities, track progress, and keep your team aligned.</p></div><button className="primary-action" type="button"><span aria-hidden="true">＋</span> New incident</button></section>
+    <section className="welcome-row" aria-labelledby="dashboard-overview"><div><p className="eyebrow">Overview</p><h2 id="dashboard-overview">Incident operations at a glance</h2><p>Monitor priorities, track progress, and keep your team aligned.</p></div><Link className="primary-action" href="/incidents/new"><span aria-hidden="true">＋</span> New incident</Link></section>
     {status === "loading" ? <DashboardSkeleton/> : <>
       <section className="stats-grid" aria-label="Incident statistics">{stats.map((stat) => <StatCard key={stat.label} stat={stat}/>)}</section>
       {status === "error" ? <section className="panel dashboard-state error-state"><div className="state-icon">!</div><h3>Unable to load incidents.</h3><p>Please check your connection and try again.</p><button className="secondary-action" type="button" onClick={() => void loadIncidents()}>Try again</button></section>

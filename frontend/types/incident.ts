@@ -14,6 +14,13 @@ export interface Incident {
   resolvedAt: string | null;
 }
 
+export interface CreateIncidentInput {
+  title: string;
+  description: string;
+  priority: IncidentPriority;
+  category: IncidentCategory;
+}
+
 export type StatTone = "teal" | "blue" | "red" | "green";
 
 export interface DashboardStat {

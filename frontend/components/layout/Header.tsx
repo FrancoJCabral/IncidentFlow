@@ -11,7 +11,7 @@ function initialsFromEmail(email: string): string {
   return characters.slice(0, 2).toUpperCase() || "IF";
 }
 
-export function Header() {
+export function Header({ title = "Dashboard" }: { title?: string }) {
   const router = useRouter();
   const [user, setUser] = useState<AuthenticatedUser>();
   const [signingOut, setSigningOut] = useState(false);
@@ -28,7 +28,7 @@ export function Header() {
 
   return <header className="topbar">
     <div className="mobile-brand"><div className="brand-mark"><span/><span/><span/></div><span>IncidentFlow</span></div>
-    <div className="page-heading"><p>Workspace</p><h1>Dashboard</h1></div>
+    <div className="page-heading"><p>Workspace</p><h1>{title}</h1></div>
     <div className="header-actions">
       <label className="search-box"><Icon name="search" size={18}/><span className="sr-only">Search incidents</span><input type="search" placeholder="Search incidents..."/><kbd>⌘ K</kbd></label>
       <button className="icon-button notification-button" type="button" aria-label="Notifications"><Icon name="bell" size={20}/><span className="notification-dot"/></button>
