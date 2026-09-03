@@ -15,28 +15,21 @@ public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBa
         CreateIncidentRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var incident = new Incident(
-                request.Title,
-                request.Description,
-                request.Priority,
-                request.Category);
+        var incident = new Incident(
+            request.Title,
+            request.Description,
+            request.Priority,
+            request.Category);
 
-            dbContext.Incidents.Add(incident);
-            await dbContext.SaveChangesAsync(cancellationToken);
+        dbContext.Incidents.Add(incident);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-            var response = ToResponse(incident);
+        var response = ToResponse(incident);
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = incident.Id },
-                response);
-        }
-        catch (ArgumentException exception)
-        {
-            return BadRequest(new { error = exception.Message });
-        }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = incident.Id },
+            response);
     }
 
     [HttpGet]
@@ -79,22 +72,15 @@ public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBa
             return NotFound();
         }
 
-        try
-        {
-            incident.Update(
-                request.Title,
-                request.Description,
-                request.Priority,
-                request.Category);
+        incident.Update(
+            request.Title,
+            request.Description,
+            request.Priority,
+            request.Category);
 
-            await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-            return Ok(ToResponse(incident));
-        }
-        catch (ArgumentException exception)
-        {
-            return BadRequest(new { error = exception.Message });
-        }
+        return Ok(ToResponse(incident));
     }
 
     [HttpPatch("{id:guid}/status")]
@@ -111,17 +97,10 @@ public class IncidentsController(IncidentFlowDbContext dbContext) : ControllerBa
             return NotFound();
         }
 
-        try
-        {
-            incident.ChangeStatus(request.Status);
-            await dbContext.SaveChangesAsync(cancellationToken);
+        incident.ChangeStatus(request.Status);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-            return Ok(ToResponse(incident));
-        }
-        catch (InvalidOperationException exception)
-        {
-            return BadRequest(new { error = exception.Message });
-        }
+        return Ok(ToResponse(incident));
     }
 
     private static IncidentResponse ToResponse(Incident incident) => new(
