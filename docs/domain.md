@@ -1,6 +1,6 @@
 # Modelo de dominio del MVP
 
-Este documento define el alcance funcional inicial de IncidentFlow. El modelo es conceptual: en esta etapa no establece una implementación técnica, un esquema de persistencia ni contratos definitivos de API.
+Este documento define las reglas centrales del dominio implementado por el MVP de IncidentFlow. Los detalles de persistencia y los contratos HTTP se documentan por separado.
 
 ## Incident
 
@@ -17,6 +17,8 @@ Una incidencia representa un problema, error, interrupción o situación que req
 | `CreatedAt` | Registra automáticamente el momento en que se creó la incidencia. |
 | `UpdatedAt` | Registra el momento de la modificación más reciente de la incidencia. |
 | `ResolvedAt` | Registra el momento en que la incidencia alcanzó el estado `Resolved`. No tiene valor mientras la incidencia no esté resuelta y se limpia si el problema reaparece. |
+| `IsArchived` | Indica si una incidencia cerrada fue archivada mediante soft delete. |
+| `ArchivedAt` | Registra el momento UTC en que la incidencia fue archivada. No tiene valor mientras permanezca activa. |
 
 Los timestamps se expresarán en UTC para mantener una referencia temporal consistente e independiente de la ubicación de los usuarios o de la infraestructura.
 
@@ -78,20 +80,19 @@ No se contemplan otras transiciones para el MVP. En particular, `Closed` es un e
 9. Si una incidencia en estado `Resolved` vuelve a `InProgress`, `ResolvedAt` debe volver a `null`.
 10. Al pasar de `Resolved` a `Closed`, `ResolvedAt` conserva la fecha en que se resolvió la incidencia.
 11. Una incidencia en estado `Closed` representa el cierre definitivo y no admite nuevas transiciones dentro del MVP.
+12. Solamente una incidencia en estado `Closed` puede archivarse.
+13. El archivado es un soft delete: establece `IsArchived` y `ArchivedAt` sin eliminar físicamente la incidencia.
+14. Una incidencia archivada no puede archivarse nuevamente.
 
 ## Fuera del alcance actual
 
-En esta etapa todavía no se implementarán:
+El MVP actual no incluye:
 
-- Usuarios
-- Responsables
-- Autenticación
-- Roles
+- Asignación de responsables
 - Comentarios
 - Archivos adjuntos
 - SLA
 - Notificaciones
 - Auditoría
-- Frontend
 
-Estos elementos podrán agregarse posteriormente en futuras etapas del proyecto.
+Estos elementos podrán evaluarse en etapas posteriores, pero no forman parte del alcance actual del portfolio.
