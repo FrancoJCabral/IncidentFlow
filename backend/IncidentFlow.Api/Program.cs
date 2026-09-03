@@ -1,6 +1,7 @@
 using System.Text;
 using IncidentFlow.Api.Infrastructure.ErrorHandling;
 using IncidentFlow.Api.Infrastructure.Authentication;
+using IncidentFlow.Api.Development;
 using IncidentFlow.Api.Infrastructure.Persistence;
 using IncidentFlow.Api.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +12,12 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+if (builder.Environment.IsDevelopment() &&
+    builder.Configuration.GetValue<bool>("Development:LaunchFrontendBrowser"))
+{
+    builder.Services.AddHostedService<FrontendBrowserLauncher>();
+}
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("JWT signing key is not configured.");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]
@@ -87,7 +94,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>IncidentFlow.Api-9f8349ab-75c7-47f1-8ef9-f65c3ef37048</UserSecretsId>
+    <SpaRoot>..\..\frontend\</SpaRoot>
+    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>http://localhost:3000</SpaProxyServerUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +18,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.11"
+                      Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
