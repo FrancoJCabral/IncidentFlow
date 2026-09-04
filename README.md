@@ -127,6 +127,22 @@ dotnet run --project .\backend\IncidentFlow.Api\IncidentFlow.Api.csproj --launch
 
 The API development profile uses SpaProxy to start Next.js automatically.
 
+### Running with Docker
+
+Copy the example environment file, replace its placeholders with local development values, and start the stack:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- API: [http://localhost:8080](http://localhost:8080)
+- Swagger: [http://localhost:8080/swagger](http://localhost:8080/swagger)
+- Health: [http://localhost:8080/api/health](http://localhost:8080/api/health)
+
+Docker Compose starts SQL Server, applies the existing migrations, and then starts the API and frontend. The SQL Server data is stored in a named volume.
+
 ## Database
 
 IncidentFlow uses SQL Server with these migrations:
