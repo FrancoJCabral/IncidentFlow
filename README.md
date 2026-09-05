@@ -1,30 +1,30 @@
 # IncidentFlow
 
-Enterprise-style incident management system built with .NET 8 and Next.js.
+Sistema de gestión de incidencias con enfoque empresarial, desarrollado con .NET 8 y Next.js.
 
 [![CI](https://github.com/FrancoJCabral/IncidentFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/FrancoJCabral/IncidentFlow/actions/workflows/ci.yml)
 
-IncidentFlow replaces fragmented incident tracking across messages, email, and disconnected tools with a centralized workflow. It provides a clear view of incident priority, category, status, and operational metrics from creation through resolution and closure.
+IncidentFlow reemplaza el seguimiento fragmentado de incidencias mediante mensajes, correos electrónicos y herramientas desconectadas por un flujo de trabajo centralizado. Proporciona una visión clara de la prioridad, la categoría, el estado y las métricas operativas de cada incidencia, desde su creación hasta su resolución y cierre.
 
-## Overview
+## Descripción general
 
-IncidentFlow centralizes incident registration, prioritization, categorization, lifecycle management, and archiving. The application combines an authenticated web interface, dashboard metrics, search and filters, a REST API, and SQL Server persistence.
+IncidentFlow centraliza el registro, la priorización, la categorización, la gestión del ciclo de vida y el archivado de incidencias. La aplicación combina una interfaz web autenticada, métricas en un dashboard, búsqueda y filtros, una API REST y persistencia en SQL Server.
 
-## Key Features
+## Funcionalidades principales
 
-- User registration and authentication
-- JWT authentication with HttpOnly cookies
-- Role-based authorization for Admin and Operator users
-- Incident creation and editing
-- Priority and category management
-- Controlled status workflow
-- Archive / soft delete
-- Dashboard KPIs
-- Search and combined filters
-- Validation and global error handling
-- Automated domain and API integration tests
+- Registro y autenticación de usuarios
+- Autenticación JWT mediante cookies HttpOnly
+- Autorización basada en roles para usuarios Admin y Operator
+- Creación y edición de incidencias
+- Gestión de prioridades y categorías
+- Flujo controlado de estados
+- Archivado mediante soft delete
+- KPIs en el dashboard
+- Búsqueda y filtros combinados
+- Validación y manejo global de errores
+- Pruebas automatizadas del dominio y de integración de la API
 
-## Incident Workflow
+## Flujo de estados
 
 ```mermaid
 flowchart LR
@@ -34,22 +34,22 @@ flowchart LR
     Resolved --> InProgress
 ```
 
-`Closed` is terminal. A resolved incident may return to `InProgress` when the problem reappears.
+`Closed` es un estado terminal. Una incidencia en estado `Resolved` puede volver a `InProgress` si el problema reaparece.
 
-## Architecture
+## Arquitectura
 
 ```mermaid
 flowchart TD
-    Browser --> NextJS[Next.js]
+    Browser[Navegador] --> NextJS[Next.js]
     NextJS --> Handlers[Next.js Route Handlers]
     Handlers --> API[ASP.NET Core API]
     API --> EF[Entity Framework Core]
     EF --> Database[(SQL Server)]
 ```
 
-The frontend stores the JWT in an HttpOnly cookie. For authenticated operations, the browser calls Next.js Route Handlers, which act as the server-side boundary and forward requests to the .NET API.
+El frontend almacena el JWT en una cookie HttpOnly. Para las operaciones autenticadas, el navegador llama a los Route Handlers de Next.js, que actúan como límite del lado del servidor y reenvían las solicitudes a la API .NET.
 
-## Tech Stack
+## Stack tecnológico
 
 **Backend**
 
@@ -57,7 +57,7 @@ The frontend stores the JWT in an HttpOnly cookie. For authenticated operations,
 - ASP.NET Core Web API
 - Entity Framework Core 8
 - SQL Server
-- JWT Bearer authentication
+- Autenticación JWT Bearer
 - Swagger / OpenAPI
 
 **Frontend**
@@ -67,52 +67,52 @@ The frontend stores the JWT in an HttpOnly cookie. For authenticated operations,
 - TypeScript
 - Tailwind CSS
 
-**Testing**
+**Pruebas**
 
 - xUnit
 - `WebApplicationFactory`
-- SQLite relational in-memory databases for integration tests
+- Bases de datos relacionales SQLite en memoria para las pruebas de integración
 
-**Tooling**
+**Herramientas**
 
 - Visual Studio 2022
 - Git / GitHub
 
-## Project Structure
+## Estructura del proyecto
 
 ```text
-backend/   ASP.NET Core API, domain, and persistence
-frontend/  Next.js application and server-side Route Handlers
-tests/     Domain and API integration test projects
-docs/      Domain documentation
+backend/   API ASP.NET Core, dominio y persistencia
+frontend/  Aplicación Next.js y Route Handlers del lado del servidor
+tests/     Proyectos de pruebas del dominio y de integración de la API
+docs/      Documentación del dominio
 ```
 
-## Running Locally
+## Ejecución local
 
 ### Visual Studio 2022
 
-Prerequisites: .NET 8 SDK, Node.js with npm, SQL Server, and the EF Core CLI tools.
+Requisitos previos: SDK de .NET 8, Node.js con npm, SQL Server y las herramientas de línea de comandos de EF Core.
 
-1. Clone the repository.
-2. Restore frontend packages with `npm install` from `frontend/`.
-3. Configure the SQL Server connection string and JWT signing key with User Secrets:
+1. Clonar el repositorio.
+2. Restaurar los paquetes del frontend ejecutando `npm install` desde `frontend/`.
+3. Configurar la cadena de conexión de SQL Server y la clave de firma JWT mediante User Secrets:
 
    ```powershell
    dotnet user-secrets set "ConnectionStrings:IncidentFlowDb" "Server=<SQL_SERVER_INSTANCE>;Database=IncidentFlowDb;Trusted_Connection=True;TrustServerCertificate=True;" --project .\backend\IncidentFlow.Api\IncidentFlow.Api.csproj
    dotnet user-secrets set "Jwt:Key" "<AT_LEAST_32_CHARACTERS_FOR_LOCAL_DEVELOPMENT>" --project .\backend\IncidentFlow.Api\IncidentFlow.Api.csproj
    ```
 
-4. Apply the migrations:
+4. Aplicar las migraciones:
 
    ```powershell
    dotnet ef database update --project .\backend\IncidentFlow.Api\IncidentFlow.Api.csproj
    ```
 
-5. Copy `frontend/.env.example` to `frontend/.env.local` and keep the provided local API URL.
-6. Open `IncidentFlow.sln` and select `IncidentFlow.Api` as the startup project.
-7. Press Play. Visual Studio starts the API, SpaProxy runs `npm run dev`, and the frontend opens in Chrome.
+5. Copiar `frontend/.env.example` como `frontend/.env.local` y conservar la URL local de la API proporcionada.
+6. Abrir `IncidentFlow.sln` y seleccionar `IncidentFlow.Api` como proyecto de inicio.
+7. Presionar Play. Visual Studio inicia la API, SpaProxy ejecuta `npm run dev` y el frontend se abre en Chrome.
 
-Local URLs:
+URLs locales:
 
 - Frontend: [http://localhost:3000](http://localhost:3000)
 - API: [https://localhost:7231](https://localhost:7231)
@@ -121,17 +121,17 @@ Local URLs:
 
 ### CLI
 
-After completing the same configuration, run:
+Después de completar la misma configuración, ejecutar:
 
 ```powershell
 dotnet run --project .\backend\IncidentFlow.Api\IncidentFlow.Api.csproj --launch-profile https
 ```
 
-The API development profile uses SpaProxy to start Next.js automatically.
+El perfil de desarrollo de la API utiliza SpaProxy para iniciar Next.js automáticamente.
 
-### Running with Docker
+### Ejecución con Docker
 
-Copy the example environment file, replace its placeholders with local development values, and start the stack:
+Copiar el archivo de entorno de ejemplo, reemplazar sus marcadores con valores locales de desarrollo e iniciar el stack:
 
 ```powershell
 Copy-Item .env.example .env
@@ -143,21 +143,21 @@ docker compose up --build
 - Swagger: [http://localhost:8080/swagger](http://localhost:8080/swagger)
 - Health: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
-Docker Compose starts SQL Server, applies the existing migrations, and then starts the API and frontend. The SQL Server data is stored in a named volume.
+Docker Compose inicia SQL Server, aplica las migraciones existentes y luego inicia la API y el frontend. Los datos de SQL Server se almacenan en un volumen con nombre.
 
-## Database
+## Base de datos
 
-IncidentFlow uses SQL Server with these migrations:
+IncidentFlow utiliza SQL Server con las siguientes migraciones:
 
 - `InitialCreate`
 - `AddUsers`
 - `AddIncidentArchiving`
 
-Incident deletion is implemented as a soft delete. Archived incidents retain their data and are marked with `IsArchived` and `ArchivedAt` instead of being physically removed.
+La eliminación de incidencias está implementada mediante soft delete. Las incidencias archivadas conservan sus datos y se marcan con `IsArchived` y `ArchivedAt` en lugar de eliminarse físicamente.
 
-## Testing
+## Pruebas automatizadas
 
-The solution currently contains 82 automated tests: 37 domain tests and 45 API integration tests.
+La solución contiene actualmente 82 pruebas automatizadas: 37 pruebas de dominio y 45 pruebas de integración de la API.
 
 ```powershell
 dotnet test IncidentFlow.sln
@@ -165,52 +165,52 @@ dotnet test IncidentFlow.sln
 
 ## API
 
-| Area | Method | Endpoint | Purpose |
+| Área | Método | Endpoint | Propósito |
 | --- | --- | --- | --- |
-| Auth | `POST` | `/api/auth/register` | Register an Operator account |
-| Auth | `POST` | `/api/auth/login` | Authenticate a user |
-| Auth | `GET` | `/api/auth/me` | Return the authenticated user |
-| Incidents | `GET` | `/api/incidents` | List active incidents |
-| Incidents | `GET` | `/api/incidents/{id}` | Get an incident |
-| Incidents | `POST` | `/api/incidents` | Create an incident |
-| Incidents | `PUT` | `/api/incidents/{id}` | Edit an incident |
-| Incidents | `PATCH` | `/api/incidents/{id}/status` | Change incident status |
-| Incidents | `DELETE` | `/api/incidents/{id}` | Archive an incident |
-| Health | `GET` | `/api/health` | Check API health |
+| Autenticación | `POST` | `/api/auth/register` | Registrar una cuenta Operator |
+| Autenticación | `POST` | `/api/auth/login` | Autenticar un usuario |
+| Autenticación | `GET` | `/api/auth/me` | Obtener el usuario autenticado |
+| Incidencias | `GET` | `/api/incidents` | Listar las incidencias activas |
+| Incidencias | `GET` | `/api/incidents/{id}` | Obtener una incidencia |
+| Incidencias | `POST` | `/api/incidents` | Crear una incidencia |
+| Incidencias | `PUT` | `/api/incidents/{id}` | Editar una incidencia |
+| Incidencias | `PATCH` | `/api/incidents/{id}/status` | Cambiar el estado de una incidencia |
+| Incidencias | `DELETE` | `/api/incidents/{id}` | Archivar una incidencia |
+| Estado | `GET` | `/api/health` | Comprobar el estado de la API |
 
-`DELETE` performs a soft delete/archive and does not physically remove the incident.
+`DELETE` realiza un soft delete o archivado y no elimina físicamente la incidencia.
 
-## Engineering Decisions
+## Decisiones técnicas
 
-- Status transitions are enforced by domain rules rather than arbitrary updates.
-- Soft delete preserves incident history.
-- The frontend keeps JWTs in HttpOnly cookies instead of browser storage.
-- Next.js Route Handlers provide a server-side boundary between the browser and .NET API.
-- API integration tests use a relational SQLite in-memory database.
-- SQL Server is used for local application persistence.
+- Las transiciones de estado se controlan mediante reglas de dominio en lugar de actualizaciones arbitrarias.
+- El soft delete preserva el historial de las incidencias.
+- El frontend mantiene los JWT en cookies HttpOnly en lugar de almacenarlos en el navegador.
+- Los Route Handlers de Next.js proporcionan un límite del lado del servidor entre el navegador y la API .NET.
+- Las pruebas de integración de la API utilizan una base de datos relacional SQLite en memoria.
+- SQL Server se utiliza para la persistencia local de la aplicación.
 
-More domain detail is available in [`docs/domain.md`](docs/domain.md).
+Puede consultarse más información sobre el dominio en [`docs/domain.md`](docs/domain.md).
 
-## Screenshots
+## Capturas de pantalla
 
 ### Dashboard
 
-![IncidentFlow dashboard](docs/screenshots/dashboard.png)
+![Dashboard de IncidentFlow](docs/screenshots/dashboard.png)
 
-### Login
+### Inicio de sesión
 
-![IncidentFlow login](docs/screenshots/login.png)
+![Inicio de sesión de IncidentFlow](docs/screenshots/login.png)
 
-### New Incident
+### Nueva incidencia
 
-![IncidentFlow new incident form](docs/screenshots/incident-form.png)
+![Formulario de nueva incidencia de IncidentFlow](docs/screenshots/incident-form.png)
 
-## Roadmap
+## Estado del proyecto
 
-**Completed:** MVP, authentication, incident lifecycle, dashboard, search and filters, archiving, automated tests, Docker, and GitHub Actions.
+**Completado:** MVP, autenticación, ciclo de vida de incidencias, dashboard, búsqueda y filtros, archivado, pruebas automatizadas, Docker y GitHub Actions.
 
-IncidentFlow is complete within its portfolio scope.
+IncidentFlow está terminado dentro de su alcance como proyecto de portfolio.
 
-## Author
+## Autor
 
 Franco J. Cabral — [GitHub](https://github.com/FrancoJCabral)
