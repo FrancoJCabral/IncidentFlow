@@ -2,6 +2,8 @@
 
 Enterprise-style incident management system built with .NET 8 and Next.js.
 
+[![CI](https://github.com/FrancoJCabral/IncidentFlow/actions/workflows/ci.yml/badge.svg)](https://github.com/FrancoJCabral/IncidentFlow/actions/workflows/ci.yml)
+
 IncidentFlow replaces fragmented incident tracking across messages, email, and disconnected tools with a centralized workflow. It provides a clear view of incident priority, category, status, and operational metrics from creation through resolution and closure.
 
 ## Overview
@@ -191,16 +193,23 @@ More domain detail is available in [`docs/domain.md`](docs/domain.md).
 
 ## Screenshots
 
-- **Dashboard:** screenshot to be added
-- **Login:** screenshot to be added
-- **Create Incident:** screenshot to be added
-- **Edit Incident:** screenshot to be added
+### Dashboard
+
+![IncidentFlow dashboard](docs/screenshots/dashboard.png)
+
+### Login
+
+![IncidentFlow login](docs/screenshots/login.png)
+
+### New Incident
+
+![IncidentFlow new incident form](docs/screenshots/incident-form.png)
 
 ## Roadmap
 
-**Completed:** MVP, authentication, incident lifecycle, dashboard, search/filter, archiving, and automated tests.
+**Completed:** MVP, authentication, incident lifecycle, dashboard, search and filters, archiving, automated tests, Docker, and GitHub Actions.
 
-**Next:** Docker, GitHub Actions, and deployment.
+IncidentFlow is complete within its portfolio scope.
 
 ## Author
 
